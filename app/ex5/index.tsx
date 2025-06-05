@@ -1,44 +1,70 @@
-import { Text, View, Image, Button, TouchableOpacity, TextInput, ScrollView } from "react-native";
+import { Text, View, Image, Button, TouchableOpacity, TextInput, ScrollView, ActivityIndicator } from "react-native";
 import {useState, useEffect} from "react";
 
 export default function Index() {
     
-    const [nomePokemon, setNomePokemon] = useState("");
-    const [dadosPokemon, setDadosPokemon] = useState();
-
-    async function BuscarPokemon(){
-        if (nomePokemon != ""){
-        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${nomePokemon}`);
-        const data = await response.json();
-        if (data){
-            setDadosPokemon(data);
-            }
-        }
-    }
-
+    const [produtos, setProdutos] = useState([]);
+    const [loading, setLoading] = useState(true);
+  
     useEffect(() => {
-        BuscarPokemon();
-    }, [nomePokemon]);
+      const fetchProdutos = async () => {
+        try {
+          const response = await fetch('https://fakestoreapi.com/products');
+          const data = await response.json();
+          setProdutos(data);
+          setLoading(false);
+          
+        } catch (error) {
+          console.error('Erro ao buscar produtos:', error);
+          setLoading(false);
+        }
+      }
 
+      fetchProdutos();
+    }, []);
     
+    console.log(produtos)
 
+    if(loading){
+      return(
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      )
+    }
     return (
       <View className="flex-1 items-center bg-black">
         
-        <TextInput
-        className="text-white"
-        placeholder="Digite o nome do pokemon..."
-        onChangeText={setNomePokemon}/>
+      <Text className="text-4xl text-white m-3">🏬 Loja virtual</Text>
 
-        <TouchableOpacity
-        className="bg-blue-600 rounded-xl p-2 m-2 w-3/4 "
-        onPress={BuscarPokemon}
-        >
-          <Text className="text-xl text-white text-center">Buscar pokemon</Text>
-        </TouchableOpacity>
+      <ScrollView className="flex-1" >
+      {produtos.map((produto) => (
 
-        <View>
+          <View className="bg-white rounded-xl p-3 m-3 text-left">
+            <View className="flex-1 justify-center items-center">
+              <Image className="w-52 h-52 m-5"
+              source={{uri:produto.image}}
+              resizeMode="contain"
+              
+              />
+            </View>
+    
+            <View >
 
+              <Text  className="text-lg text-black font-bold text-left">
+                {produto.title}
+              </Text>
+              <Text className="text-sm text-gray-600 text-left">
+                {produto.category}
+              </Text>
+              
+              <Text className="text-lg text-green-600 text-left">R$ {produto.price}</Text>
+
+            </View>
+
+          </View>
+        ))}
+      </ScrollView>
 
 
       </View>
